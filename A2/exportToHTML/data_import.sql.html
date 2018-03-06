@@ -1,0 +1,215 @@
+<html>
+<head>
+<title>data_import.sql</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(169,183,198); }
+.s1 { color: rgb(204,120,50); font-weight: bold; }
+.s2 { color: rgb(204,120,50); }
+.s3 { color: rgb(106,135,89); }
+.s4 { color: rgb(104,151,187); }
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+data_import.sql</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">\</span><span class="s1">connect </span><span class="s0">postgres 
+</span><span class="s1">DROP DATABASE IF EXISTS </span><span class="s0">db_paragon</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">CREATE DATABASE </span><span class="s0">db_paragon</span><span class="s2">;</span><span class="s0"> 
+\</span><span class="s1">connect </span><span class="s0">db_paragon 
+</span><span class="s1">SET </span><span class="s0">CLIENT_ENCODING </span><span class="s1">TO </span><span class="s3">'utf8'</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;User&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  phone             </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">12</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  email             </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">50</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  profilePictureURL </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  firstName         </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">20</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  lastName          </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">20</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  streetAddress     </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  city              </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">30</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  state             </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">30</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  country           </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  zipcode           </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">10</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Message&quot; ( 
+  messageId         </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  fromUserId        </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  toUserId          </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  replyMessageId    </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">message           VARCHAR</span><span class="s0">(</span><span class="s4">200</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  creationDate      </span><span class="s1">DATE</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(messageId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(fromUserId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(toUserId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobSeeker&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  summary           </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">500</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  isRelocationOK    </span><span class="s1">BOOLEAN</span><span class="s2">,</span><span class="s0"> 
+  experience        </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">400</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  premiumLevel      </span><span class="s1">INT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Institute&quot; ( 
+  instituteId       </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">name              VARCHAR</span><span class="s0">(</span><span class="s4">300</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(instituteId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobSeekerEducation&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  instituteId       </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  startDate         </span><span class="s1">DATE</span><span class="s2">,</span><span class="s0"> 
+  endDate           </span><span class="s1">DATE</span><span class="s2">,</span><span class="s0"> 
+  degree            </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId</span><span class="s2">, </span><span class="s0">instituteId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(instituteId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;Institute&quot; (instituteId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Skill&quot; ( 
+  skillId           </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  skillName         </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">50</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(skillId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobSeekerSkill&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  skillId           </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId</span><span class="s2">, </span><span class="s0">skillId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(skillId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;Skill&quot; (skillId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobCategory&quot; ( 
+  categoryId        </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  categoryName      </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(categoryId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobSeekerCategory&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  categoryId        </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId</span><span class="s2">, </span><span class="s0">categoryId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(categoryId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;JobCategory&quot; (categoryId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobSeekerHonor&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  honorName         </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">50</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId</span><span class="s2">, </span><span class="s0">honorName)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobSeekerCertificate&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  certificateName   </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">50</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId</span><span class="s2">, </span><span class="s0">certificateName)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Employer&quot; ( 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">position          VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobList&quot; ( 
+  jobId             </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  title             </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  salary            </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">20</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  postDate          </span><span class="s1">DATE</span><span class="s2">,</span><span class="s0"> 
+  responsibility    </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">500</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  timeDemand        </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">20</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(jobId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobListCategory&quot; ( 
+  jobId             </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  categoryId        </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(jobId</span><span class="s2">, </span><span class="s0">categoryId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(jobId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;JobList&quot; (jobId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(categoryId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;JobCategory&quot; (categoryId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Chatbot&quot; ( 
+  questionId        </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  question          </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">200</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(questionId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Company&quot; ( 
+  companyId         </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  companyName       </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">50</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  socialMediaHandle </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">150</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  summary           </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">500</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  logo              </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">100</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  companySize       </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">20</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  website           </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">60</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(companyId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;JobApplication&quot; ( 
+  applicationId     </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  jobSeekerId       </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  jobId             </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  applyDate         </span><span class="s1">DATE</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(applicationId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(jobSeekerId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(jobId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;JobList&quot; (jobId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;ChatbotAnswer&quot; ( 
+  applicationId     </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  questionId        </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  answer            </span><span class="s1">VARCHAR</span><span class="s0">(</span><span class="s4">300</span><span class="s0">)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(applicationId</span><span class="s2">, </span><span class="s0">questionId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(applicationId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;JobApplication&quot; (applicationId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(questionId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;Chatbot&quot; (questionId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">CREATE TABLE </span><span class="s0">&quot;Employment&quot; ( 
+  companyId         </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  userId            </span><span class="s1">BIGINT</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">PRIMARY KEY </span><span class="s0">(companyId</span><span class="s2">, </span><span class="s0">userId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(companyId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;Company&quot; (companyId)</span><span class="s2">,</span><span class="s0"> 
+  </span><span class="s1">FOREIGN KEY </span><span class="s0">(userId) </span><span class="s1">REFERENCES </span><span class="s0">&quot;User&quot; (userId) 
+)</span><span class="s2">;</span><span class="s0"> 
+ 
+</span><span class="s1">COPY </span><span class="s0">&quot;User&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\User.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Message&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Message.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobSeeker&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobSeeker.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Institute&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Institute.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobSeekerEducation&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobSeekerEducation.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Skill&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Skill.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobSeekerSkill&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobSeekerSkill.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobCategory&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobCategory.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobSeekerCategory&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobSeekerCategory.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobSeekerHonor&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobSeekerHonor.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobSeekerCertificate&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobSeekerCertificate.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Employer&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Employer.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobList&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobList.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobListCategory&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobListCategory.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Chatbot&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Chatbot.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Company&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Company.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;JobApplication&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\JobApplication.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;ChatbotAnswer&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\ChatbotAnswer.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span><span class="s0"> 
+</span><span class="s1">COPY </span><span class="s0">&quot;Employment&quot; </span><span class="s1">from </span><span class="s3">'C:\Users\Nick\Documents\_Code\CSCI485\A2\data\Employment.csv' </span><span class="s1">WITH </span><span class="s0">(</span><span class="s1">FORMAT CSV</span><span class="s0">)</span><span class="s2">;</span></pre>
+</body>
+</html>
