@@ -54,6 +54,7 @@ public class UnitTest3 {
 			byte[] data = new byte[ChunkServer.ChunkSize];
 			data = client.getChunk(ChunkHandle, 0, ChunkServer.ChunkSize);
 			byte[] ValInBytes = ByteBuffer.allocate(intSize).putInt(i).array();
+			
 			// Verify that the content of the array of bytes matches the value i
 			for (int j = 0; j < num; j++) {
 				for (int k = 0; k < intSize; k++) {

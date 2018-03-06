@@ -1,5 +1,12 @@
 package com.chunkserver;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 import com.interfaces.ChunkServerInterface;
 
 /**
@@ -10,7 +17,8 @@ import com.interfaces.ChunkServerInterface;
  */
 
 public class ChunkServer implements ChunkServerInterface {
-	final static String filePath = "C:\\Users\\shahram\\Documents\\TinyFS-2\\csci485Disk\\"; // or C:\\newfile.txt
+//	final static String filePath = "C:\\Users\\shahram\\Documents\\TinyFS-2\\csci485Disk\\"; // or C:\\newfile.txt
+	final static String filePath = "C:\\Users\\Nick\\Documents\\csci485test\\newfile.txt";
 	public static long counter;
 
 	/**
@@ -27,9 +35,8 @@ public class ChunkServer implements ChunkServerInterface {
 	 * in the file.
 	 */
 	public String initializeChunk() {
-		System.out.println("createChunk invoked:  Part 1 of TinyFS must implement the body of this method.");
-		System.out.println("Returns null for now.\n");
-		return null;
+		++counter;
+		return String.valueOf(counter);
 	}
 
 	/**
@@ -37,17 +44,37 @@ public class ChunkServer implements ChunkServerInterface {
 	 * should be no greater than 4KB
 	 */
 	public boolean putChunk(String ChunkHandle, byte[] payload, int offset) {
-		System.out.println("writeChunk invoked:  Part 1 of TinyFS must implement the body of this method.");
-		System.out.println("Returns false for now.\n");
-		return false;
+		FileOutputStream chunkFile = null;
+		try {
+			// Creates a file if not exists. If it does just opens it
+			chunkFile = new FileOutputStream(filePath + ChunkHandle, true);
+			// Append to file
+			/* ?????? Should we be checking for the array size here or is it guaranteed??? */
+			chunkFile.write(payload, offset, payload.length);
+			// Close the chunkFile
+			chunkFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * read the chunk at the specific offset
 	 */
 	public byte[] getChunk(String ChunkHandle, int offset, int NumberOfBytes) {
-		System.out.println("readChunk invoked:  Part 1 of TinyFS must implement the body of this method.");
-		System.out.println("Returns null for now.\n");
+		FileInputStream chunkFile = null;
+		try {
+			chunkFile = new FileInputStream(filePath + ChunkHandle);
+			byte [] chunkData = new byte[NumberOfBytes];
+			chunkFile.read(chunkData, offset, NumberOfBytes);
+			chunkFile.close();
+			return chunkData;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return null;
 	}
 
