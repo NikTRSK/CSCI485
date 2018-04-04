@@ -27,16 +27,13 @@ public class ChunkServer implements ChunkServerInterface {
 	final static String filePath = "csci485/";	//or C:\\newfile.txt
 	public static long counter;
 	
-	private final static String metadataFilename = ".metadata";
+	public final static String metadataFilename = "./.metadata";
 	private ServerSocket mServerSocket = null;
 	private Socket mSocket = null;
 	
 	// reader
 	private ObjectInputStream mOIS = null;
 	private ObjectOutputStream mOOS = null;
-	
-	private boolean isRunning = true;
-	public static int portID = 8000;
 	/**
 	 * Initialize the chunk server
 	 */
@@ -54,49 +51,68 @@ public class ChunkServer implements ChunkServerInterface {
 			Arrays.sort(cntrs);
 			counter = cntrs[cntrs.length - 1];
 		}
-		
+
+		boolean processInput = true;
 		// Open Socket
 		try {
-			mServerSocket = new ServerSocket(ChunkServer.portID);
+			mServerSocket = new ServerSocket(0);
 			System.out.println("Listening on: " + mServerSocket.getLocalPort());
 			updateMetadata(mServerSocket.getLocalPort());
-			mSocket = mServerSocket.accept();
-			// Initialize the streams
-			mOIS = new ObjectInputStream(mSocket.getInputStream());
-			mOOS = new ObjectOutputStream(mSocket.getOutputStream());
 			
-			System.out.println("Client connected");
-		while(isRunning) {
-			try {
-					// Read in and process input
-					int requestCode = mOIS.readInt();
-					System.out.println("CODE: " + requestCode);
-					if (requestCode == CommunicationInterface.INIT_CHUNK) {
-						String chunkHandle = initializeChunk();
-						mOOS.writeObject(chunkHandle);
-						mOOS.flush();
-					}
-					else if (requestCode == CommunicationInterface.GET_CHUNK) {
-						String handle = (String)mOIS.readObject();
-						Integer offset = mOIS.readInt();
-						Integer length = mOIS.readInt();
-						byte [] payload = getChunk(handle, offset, length);
-						mOOS.write(payload);
-						mOOS.flush();
-					}
-					else if (requestCode == CommunicationInterface.PUT_CHUNK) {
-						String handle = (String)mOIS.readObject();
-						Integer offSet = mOIS.readInt();
-						Integer length = mOIS.readInt();
-						byte [] payload = new byte[length];
-						mOIS.readFully(payload);
-						putChunk(handle, payload, offSet);
-					}
-					else if (requestCode == CommunicationInterface.SHUTDOWN) {
-						isRunning = false;
-					}
-				} catch (IOException | ClassNotFoundException ioe) { /* ioe.printStackTrace(); */ 
-					continue; }
+			while(true) {
+				mSocket = mServerSocket.accept();
+				// Initialize the streams
+				mOIS = new ObjectInputStream(mSocket.getInputStream());
+				mOOS = new ObjectOutputStream(mSocket.getOutputStream());
+				
+				System.out.println("Client connected");
+				while(processInput) {
+					try {
+							// Read in and process input
+							int requestCode = mOIS.readInt();
+							if (requestCode == CommunicationInterface.INIT_CHUNK) {
+								String chunkHandle = initializeChunk();
+								
+								if (chunkHandle == null) {
+									mOOS.writeInt(CommunicationInterface.SUCCESS);
+									mOOS.flush();
+								}
+								
+								mOOS.writeObject(chunkHandle);
+								mOOS.flush();
+								
+								mOOS.writeInt(CommunicationInterface.SUCCESS);
+								mOOS.flush();
+							}
+							else if (requestCode == CommunicationInterface.GET_CHUNK) {
+								String handle = (String)mOIS.readObject();
+								Integer offset = mOIS.readInt();
+								Integer length = mOIS.readInt();
+								byte [] payload = getChunk(handle, offset, length);
+								mOOS.write(payload);
+								mOOS.flush();
+								
+								mOOS.writeInt(CommunicationInterface.SUCCESS);
+								mOOS.flush();
+							}
+							else if (requestCode == CommunicationInterface.PUT_CHUNK) {
+								String handle = (String)mOIS.readObject();
+								Integer offSet = mOIS.readInt();
+								Integer length = mOIS.readInt();
+								byte [] payload = new byte[length];
+								mOIS.readFully(payload);
+								putChunk(handle, payload, offSet);
+								
+								mOOS.writeInt(CommunicationInterface.SUCCESS);
+								mOOS.flush();
+							}
+						} catch (IOException | ClassNotFoundException ioe) {
+							mSocket.close();
+							mOOS.close();
+							mOIS.close();
+							break;
+						}
+				}
 			}
 		} catch (IOException ioe) { ioe.printStackTrace(); }
 		finally {

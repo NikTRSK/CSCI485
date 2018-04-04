@@ -33,18 +33,13 @@ public class Client implements ClientInterface {
 	 * Initialize the client
 	 */
 	public Client(){
-		System.out.println("Client constructor");
-//		if (Client.mSocket == null) {
-		if (mSocket != null) { System.out.println("mSocket already in use"); return; }
-		System.out.println("Check 0 " + Client.mSocket != null);
+		if (mSocket != null) { return; }
 		try {
-			
-			Client.mSocket = new Socket("localhost", ChunkServer.portID);
+			Integer portID = parseMetadata();
+			Client.mSocket = new Socket("localhost", portID);
 			Client.mOOS = new ObjectOutputStream(mSocket.getOutputStream());
 			Client.mOIS = new ObjectInputStream(mSocket.getInputStream());
 		} catch (IOException e) { e.printStackTrace(); }
-//		}
-		System.out.println("Check 1");
 	}
 	
 	/**
@@ -56,6 +51,9 @@ public class Client implements ClientInterface {
 			Client.mOOS.writeInt(CommunicationInterface.INIT_CHUNK);
 			Client.mOOS.flush();
 			chunkHandle = (String)Client.mOIS.readObject();
+			
+			int success = mOIS.readInt();
+			if (success == CommunicationInterface.FAILURE) return null;
 		} catch (IOException | ClassNotFoundException e) { e.printStackTrace(); }
 		
 		return chunkHandle;
@@ -80,7 +78,8 @@ public class Client implements ClientInterface {
 			Client.mOOS.write(payload);
 			Client.mOOS.flush();
 			
-			return true;
+			int success = mOIS.readInt();
+			if (success == CommunicationInterface.SUCCESS) return true;
 		} catch (IOException ioe) { ioe.printStackTrace(); }
 		
 		return false;
@@ -106,6 +105,10 @@ public class Client implements ClientInterface {
 			
 			byte [] payload = new byte[NumberOfBytes];
 			Client.mOIS.readFully(payload);
+			
+			int success = mOIS.readInt();
+			if (success == CommunicationInterface.FAILURE) return null;
+			
 			return payload;
 		} catch (IOException ioe) { ioe.printStackTrace(); }
 		
@@ -114,8 +117,19 @@ public class Client implements ClientInterface {
 
 	public void disconnect() {
 		try {
-			Client.mOOS.writeInt(CommunicationInterface.SHUTDOWN);
-			Client.mOOS.flush();
+			if (mOIS != null) {
+				mOIS.close();
+				mOIS = null;
+			}
+
+			if (mOOS != null) {
+				mOOS.close();
+				mOOS = null;
+			}
+			if (mSocket != null) {
+				mSocket.close();
+				mSocket = null;
+			}
 		} catch (IOException e) { e.printStackTrace(); }
 	}
 
@@ -126,12 +140,10 @@ public class Client implements ClientInterface {
 		Integer portID = null;
 		FileInputStream metadata = null;
         BufferedReader reader = null;
-		String metadataFilename = ".metadata";
 		try {
-			metadata = new FileInputStream(metadataFilename);
+			metadata = new FileInputStream(ChunkServer.metadataFilename);
 			reader = new BufferedReader(new InputStreamReader(metadata));
-			portID = reader.read();
-//			System.out.println(portID);
+			portID = Integer.parseInt(reader.readLine());
 			metadata.close();
 		} catch (IOException e) { e.printStackTrace(); }
 		return portID;

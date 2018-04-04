@@ -60,6 +60,8 @@ public class UnitTest5 {
         }else{
         	System.out.println("Unit test 5 result: fail!");
         }
+		trw.disconnect();
+		client.disconnect();
 	}
 	
 }

@@ -47,5 +47,9 @@ public class TestReadAndWrite {
 			return null;
 		}
 	}
-
+	
+	public void disconnect() {
+		if (client != null)
+			client.disconnect();
+	}
 }

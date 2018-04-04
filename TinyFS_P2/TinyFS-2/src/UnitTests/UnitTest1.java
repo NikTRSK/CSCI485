@@ -35,9 +35,7 @@ public class UnitTest1 {
         }
         boolean isSuccess = false;
         //Create the chunk and store its handle
-		System.out.println("Unit1 b");
         Client client = new Client();
-		System.out.println("Unit1 a");
         handle = client.initializeChunk();
         if(handle == null){
         	System.out.println("Unit test 1 result: fail!");
@@ -50,7 +48,7 @@ public class UnitTest1 {
         	System.out.println("Unit test 1 result: fail!");
         }
         
-//        client.disconnect();
+        client.disconnect();
 	}
 
 }
