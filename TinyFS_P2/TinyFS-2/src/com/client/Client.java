@@ -1,9 +1,16 @@
 package com.client;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.stream.Stream;
 
 import com.chunkserver.ChunkServer;
 import com.interfaces.ClientInterface;
@@ -18,28 +25,26 @@ public class Client implements ClientInterface {
 //	public static ChunkServer cs = new ChunkServer();
 
     // Used to comm with the server
-	private Socket mSocket = null;
-	private ObjectOutputStream mOOS = null;
-	private ObjectInputStream mOIS = null;
+	private static Socket mSocket;
+	private static ObjectOutputStream mOOS = null;
+	private static ObjectInputStream mOIS = null;
 	
 	/**
 	 * Initialize the client
 	 */
 	public Client(){
-//		if (cs == null)
-//			cs = new ChunkServer();
-		
+		System.out.println("Client constructor");
+//		if (Client.mSocket == null) {
+		if (mSocket != null) { System.out.println("mSocket already in use"); return; }
+		System.out.println("Check 0 " + Client.mSocket != null);
 		try {
-			mSocket = new Socket("localhost", 8000);
-			mOOS = new ObjectOutputStream(mSocket.getOutputStream());
-			mOIS = new ObjectInputStream(mSocket.getInputStream());
-//			mOOS.flush();
-//			System.out.println("Sending stuff");
-//			mOOS.writeInt(5);
-//			mOOS.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			
+			Client.mSocket = new Socket("localhost", ChunkServer.portID);
+			Client.mOOS = new ObjectOutputStream(mSocket.getOutputStream());
+			Client.mOIS = new ObjectInputStream(mSocket.getInputStream());
+		} catch (IOException e) { e.printStackTrace(); }
+//		}
+		System.out.println("Check 1");
 	}
 	
 	/**
@@ -48,9 +53,9 @@ public class Client implements ClientInterface {
 	public String initializeChunk() {
 		String chunkHandle = null;
 		try {
-			mOOS.writeInt(CommunicationInterface.INIT_CHUNK);
-			mOOS.flush();
-			chunkHandle = (String)mOIS.readObject();
+			Client.mOOS.writeInt(CommunicationInterface.INIT_CHUNK);
+			Client.mOOS.flush();
+			chunkHandle = (String)Client.mOIS.readObject();
 		} catch (IOException | ClassNotFoundException e) { e.printStackTrace(); }
 		
 		return chunkHandle;
@@ -66,19 +71,18 @@ public class Client implements ClientInterface {
 		}
 		
 		try {
-			mOOS.writeInt(CommunicationInterface.PUT_CHUNK);
-			mOOS.flush();
+			Client.mOOS.writeInt(CommunicationInterface.PUT_CHUNK);
+			Client.mOOS.flush();
 			
-			mOOS.writeObject(ChunkHandle);
-			mOOS.writeInt(offset);
-			mOOS.writeInt(payload.length);
-			mOOS.write(payload);
-			mOOS.flush();
+			Client.mOOS.writeObject(ChunkHandle);
+			Client.mOOS.writeInt(offset);
+			Client.mOOS.writeInt(payload.length);
+			Client.mOOS.write(payload);
+			Client.mOOS.flush();
 			
 			return true;
 		} catch (IOException ioe) { ioe.printStackTrace(); }
 		
-//		return cs.putChunk(ChunkHandle, payload, offset);
 		return false;
 	}
 	
@@ -92,24 +96,44 @@ public class Client implements ClientInterface {
 		}
 		
 		try {
-			mOOS.writeInt(CommunicationInterface.GET_CHUNK);
+			Client.mOOS.writeInt(CommunicationInterface.GET_CHUNK);
+			Client.mOOS.flush();
 			
-			mOOS.writeObject(ChunkHandle);
-			mOOS.writeInt(offset);
-			mOOS.writeInt(NumberOfBytes);
-//			mOOS.write(payload);
-			mOOS.flush();
+			Client.mOOS.writeObject(ChunkHandle);
+			Client.mOOS.writeInt(offset);
+			Client.mOOS.writeInt(NumberOfBytes);
+			Client.mOOS.flush();
 			
 			byte [] payload = new byte[NumberOfBytes];
-			mOIS.readFully(payload);
+			Client.mOIS.readFully(payload);
 			return payload;
 		} catch (IOException ioe) { ioe.printStackTrace(); }
 		
 		return null;
-//		return cs.getChunk(ChunkHandle, offset, NumberOfBytes);
 	}
 
-	
+	public void disconnect() {
+		try {
+			Client.mOOS.writeInt(CommunicationInterface.SHUTDOWN);
+			Client.mOOS.flush();
+		} catch (IOException e) { e.printStackTrace(); }
+	}
 
-
+	/**
+	 * Reads in a metadata file
+	 */
+	private Integer parseMetadata() {
+		Integer portID = null;
+		FileInputStream metadata = null;
+        BufferedReader reader = null;
+		String metadataFilename = ".metadata";
+		try {
+			metadata = new FileInputStream(metadataFilename);
+			reader = new BufferedReader(new InputStreamReader(metadata));
+			portID = reader.read();
+//			System.out.println(portID);
+			metadata.close();
+		} catch (IOException e) { e.printStackTrace(); }
+		return portID;
+	}
 }

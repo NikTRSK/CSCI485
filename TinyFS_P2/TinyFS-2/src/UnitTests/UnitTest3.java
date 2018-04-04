@@ -64,7 +64,7 @@ public class UnitTest3 {
             }
         }
         System.out.println("Unit test 3 result: success!");            
-
+//        client.disconnect();
     }
 
 }
